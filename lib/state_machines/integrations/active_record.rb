@@ -448,25 +448,6 @@ module StateMachines
       end
 
       def define_state_initializer
-        if ::ActiveRecord.gem_version >= Gem::Version.new('5.0.0.alpha')
-          define_helper :instance, <<-end_eval, __FILE__, __LINE__ + 1
-            def initialize(attributes = nil)
-              super(attributes) do |*args|
-                self.class.state_machines.initialize_states(self, {}, attributes || {})
-                yield(*args) if block_given?
-              end
-            end
-          end_eval
-        elsif ::ActiveRecord.gem_version >= Gem::Version.new('4.2')
-          define_helper :instance, <<-end_eval, __FILE__, __LINE__ + 1
-            def initialize(attributes = nil, options = {})
-              super(attributes, options) do |*args|
-                self.class.state_machines.initialize_states(self, {}, attributes || {})
-                yield(*args) if block_given?
-              end
-            end
-          end_eval
-        else
           # Initializes static states
           #
           # This is the only available hook where the default set of attributes
@@ -490,7 +471,6 @@ module StateMachines
               end
             end
           end_eval
-        end
       end
 
       # Uses around callbacks to run state events if using the :save hook
